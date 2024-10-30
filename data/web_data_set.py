@@ -45,4 +45,4 @@ def get_GPU(budget, manufacturer):
 
 # Display the results
 
-print(get_CPU(budget=500, manufacturer='amd'))
+print(get_GPU(budget=500, manufacturer='amd'))
