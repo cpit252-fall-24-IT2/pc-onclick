@@ -2,15 +2,26 @@ import requests
 import pandas as pd
 from io import StringIO
 
-
 def get_best_options(url, budget=None, manufacturer=None, columns=None):
     response = requests.get(url)
+    
+    # Check if the request was successful
+    if response.status_code != 200:
+        raise ValueError(f"Failed to fetch data from {url}. Status code: {response.status_code}")
+
     csv_data = response.content.decode('utf-8')
 
     df = pd.read_csv(StringIO(csv_data))
-
+    
+    # Filter by budget
     if budget is not None:
-        df = df[df['price'] <= budget]
+        if 'price' in df.columns:
+            if budget < df['price'].min():
+                raise ValueError(f"No options found within the budget of ${budget}")
+            else:
+                df = df[df['price'] <= budget]
+        else:
+            raise KeyError("The 'price' column is not present in the DataFrame")
 
     # Filter by manufacturer keyword in the name
     if manufacturer:
@@ -24,35 +35,34 @@ def get_best_options(url, budget=None, manufacturer=None, columns=None):
 
     return top_options
 
+def get_component(component_type, budget, manufacturer):
+    if component_type == 'CPU':
+        url = 'https://raw.githubusercontent.com/docyx/pc-part-dataset/main/data/csv/cpu.csv'
+        columns = ['name', 'price', 'core_count']
+    elif component_type == 'GPU':
+        url = 'https://raw.githubusercontent.com/docyx/pc-part-dataset/main/data/csv/video-card.csv'
+        columns = ['name', 'price', 'chipset']
+    elif component_type == 'motherboard':
+        url = 'https://raw.githubusercontent.com/docyx/pc-part-dataset/main/data/csv/motherboard.csv'
+        columns = ['name', 'price', 'socket']
+    elif component_type == 'PSU':
+        url = 'https://raw.githubusercontent.com/docyx/pc-part-dataset/main/data/csv/power-supply.csv'
+        columns = ['name', 'price', 'efficiency', 'wattage', 'modular']
+    elif component_type == 'RAM':
+        url = 'https://raw.githubusercontent.com/docyx/pc-part-dataset/main/data/csv/memory.csv'
+        columns = ['name', 'price', 'speed', 'modules', 'first_word_latency', 'cas_latency']
+    else:
+        raise ValueError(f"Unknown component type: {component_type}")
+    
+    return get_best_options(url, budget, manufacturer, columns)
 
-def get_CPU(budget, manufacturer):
-    CPU_url = 'https://raw.githubusercontent.com/docyx/pc-part-dataset/main/data/csv/cpu.csv'
-    CPU_columns = ['name', 'price', 'core_count']
-    return get_best_options(CPU_url, budget, manufacturer, CPU_columns)
-
-
-def get_GPU(budget, manufacturer):
-    GPU_url = 'https://raw.githubusercontent.com/docyx/pc-part-dataset/main/data/csv/video-card.csv'
-    GPU_columns = ['name', 'price', 'chipset']
-    return get_best_options(GPU_url, budget, manufacturer, GPU_columns)
-
-
-def get_motherboard(budget, manufacturer):
-    motherboard_url = 'https://raw.githubusercontent.com/docyx/pc-part-dataset/main/data/csv/motherboard.csv'
-    motherboard_columns = ['name', 'price', 'socket']
-    return get_best_options(motherboard_url, budget, manufacturer, motherboard_columns)
-
-
-def get_power_supply(budget, manufacturer):
-    psu_url = 'https://raw.githubusercontent.com/docyx/pc-part-dataset/main/data/csv/power-supply.csv'
-    psu_columns = ['name', 'price', 'efficiency', 'wattage', 'modular']
-    return get_best_options(psu_url, budget, manufacturer, psu_columns)
-
-
-
-<<<<<<< HEAD
 # Display the results
+try:
+    print(get_component('RAM', budget=30, manufacturer=''))
+    print(get_component('CPU', budget=100, manufacturer=''))    
+    print(get_component('GPU', budget=2000000, manufacturer=''))
+    print(get_component('motherboard', budget=170, manufacturer=''))
+    print(get_component('PUS', budget=50, manufacturer=''))
+except ValueError as e:
+    print(e)
 
-print(get_GPU(budget=500, manufacturer='amd'))
-=======
->>>>>>> 2b068f91512c02a0c2977a4dd954c2f370c7cc6d
