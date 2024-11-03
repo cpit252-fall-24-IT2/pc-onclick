@@ -39,7 +39,7 @@ class AIAgent:
         return compatibility
 
 if __name__ == "__main__":
-    api_key = "keyy"
+    api_key = "k"
     base_url = "https://api.x.ai/v1"
     
     agent = AIAgent(api_key, base_url)
