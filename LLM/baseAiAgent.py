@@ -1,3 +1,4 @@
+import os
 from abc import ABC, abstractmethod
 
 class BaseAIAgent(ABC):
@@ -10,4 +11,12 @@ class BaseAIAgent(ABC):
 
     @abstractmethod
     def check_compatibility(self, user_input):
+        pass
+
+class AgentManager(ABC):
+    @abstractmethod
+    def load_api_key(self):
+        pass
+    
+    def initialize_agent(self):
         pass
