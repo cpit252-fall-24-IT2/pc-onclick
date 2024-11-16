@@ -12,7 +12,7 @@ The PC Builder guides users through selecting and configuring PC components with
 
 ### 1. Launch Screen
 ```
-Welcome to PC Builder Basic!
+Welcome to PC ONCLICK!
 
 Select an option to begin:
 1. Start New Build
@@ -50,25 +50,27 @@ Based on your use case and budget, here's your recommended build:
 
 💻 Recommended Build:
 
-CPU: AMD Ryzen 7 5800X - $349
-✓ Great for video editing with 8 cores/16 threads
-✓ Strong single-core performance for gaming
+## PC Build Components
 
-GPU: NVIDIA RTX 3060 Ti - $399
-✓ CUDA acceleration for Premiere Pro
-✓ Capable of 1440p gaming
+### CPU: AMD Ryzen 7 5800X - $349
+- Great for video editing with 8 cores/16 threads
+- Strong single-core performance for gaming
 
-RAM: 32GB DDR4-3600 - $159
-✓ Optimal for video editing workloads
-✓ Handles multiple applications easily
+### GPU: NVIDIA RTX 3060 Ti - $399
+- CUDA acceleration for Premiere Pro
+- Capable of 1440p gaming
 
-Storage: 1TB NVMe SSD - $119
-✓ Fast project loading
-✓ Quick render times
+### RAM: 32GB DDR4-3600 - $159
+- Optimal for video editing workloads
+- Handles multiple applications easily
 
-Power Supply: 750W Gold - $109
-✓ Efficient and reliable power delivery
-✓ Room for future upgrades
+### Storage: 1TB NVMe SSD - $119
+- Fast project loading
+- Quick render times
+
+### Power Supply: 750W Gold - $109
+- Efficient and reliable power delivery
+- Room for future upgrades
 
 Total: $1,135
 
