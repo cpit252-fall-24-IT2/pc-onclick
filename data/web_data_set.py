@@ -34,7 +34,8 @@ class PCComponentFetcher(baseComponentRetrieval):
 
         if columns:
             top_options = top_options[columns]
-
+         
+        print(type(top_options))
         return top_options
 
     def get_component(self, component_type, budget, manufacturer):

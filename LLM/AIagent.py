@@ -62,7 +62,7 @@ class AIAgent(BaseAIAgent):
         response = self.check_compatibility_chain.invoke(user_input)
         compatibility = response['text'].strip()
         return compatibility
-
+    
 
 
 
