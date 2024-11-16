@@ -50,25 +50,25 @@ Based on your use case and budget, here's your recommended build:
 
 💻 Recommended Build:
 
-## PC Build Components
+PC Build Components
 
-### CPU: AMD Ryzen 7 5800X - $349
+CPU: AMD Ryzen 7 5800X - $349
 - Great for video editing with 8 cores/16 threads
 - Strong single-core performance for gaming
 
-### GPU: NVIDIA RTX 3060 Ti - $399
+GPU: NVIDIA RTX 3060 Ti - $399
 - CUDA acceleration for Premiere Pro
 - Capable of 1440p gaming
 
-### RAM: 32GB DDR4-3600 - $159
+RAM: 32GB DDR4-3600 - $159
 - Optimal for video editing workloads
 - Handles multiple applications easily
 
-### Storage: 1TB NVMe SSD - $119
+Storage: 1TB NVMe SSD - $119
 - Fast project loading
 - Quick render times
 
-### Power Supply: 750W Gold - $109
+Power Supply: 750W Gold - $109
 - Efficient and reliable power delivery
 - Room for future upgrades
 
