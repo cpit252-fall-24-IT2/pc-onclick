@@ -25,8 +25,8 @@ class AIAgentManager(AgentManager):
         return api_key
 
     def initialize_agent(self):
-        # Initialize the AI agent with the API key
-        return AIAgent(api_key=self.api_key)
+         # Initialize the AI agent with the API key
+        return AIAgent(api_key=self.api_key) 
 
 
 
