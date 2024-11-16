@@ -1,123 +1,146 @@
 # Init Commit
 
+# Interactive PC Builder System
 
-How the system work :
+A step-by-step system that helps users build custom PCs with real-time compatibility checking and personalized recommendations.
 
-____________________________________________________________________________________
+## System Overview
 
- Launch the System:
+The PC Builder guides users through selecting and configuring PC components with automatic compatibility verification.
 
- Welcome to PC Builder Basic!
+## Interactive Flow
 
- Select an option to begin:
+### 1. Launch Screen
+```
+Welcome to PC Builder Basic!
 
- 1. Start New Build
- 2. View Saved Build
- 3. Exit
- >
-____________________________________________________________________________________
+Select an option to begin:
+1. Start New Build
+2. View Saved Build
+3. Exit
 
-step 1: (when the user Choose number 1 )
- Start a New Build - The user selects 'Start New Build':
+User input: "1"
+```
 
-> 1
+### 2. Build Type Selection
+```
+What type of build would you like to create?
 
-____________________________________________________________________________________
+For example, you can type:
+"Gaming"
+"Content Creation"
+"General Purpose"
+Or specify what programs you want to run or what the PC will be used for.
 
-step 2: Select Build Type:
-Choose the type of build:
-1. Gaming
-2. Content Creation
-3. General Purpose
+Please describe your needs:
+User input: "I want a PC for video editing using Adobe Premiere Pro and After Effects, with some light gaming on the side."
+```
 
-____________________________________________________________________________________
-
-Step 3: Set Budget and Get LLM-Checked Recommendations
-
-Define Budget:
+### 3. Budget Setting
+```
+Define Your Budget:
 Enter your budget (press Enter to skip):
-> 1500
 
-____________________________________________________________________________________
+User input: "$1500"
+```
 
-step 4: Generate Initial Build with LLM-Assured Compatibility:
-Based on your budget, here's a recommended build, fully compatible for Gaming:
+### 4. Initial Build Generation
+```
+Based on your use case and budget, here's your recommended build:
 
-┌──────────┬────────────────────────┐
-│ Component│ Recommendation         │
-├──────────┼────────────────────────┤
-│ CPU      │ AMD Ryzen 5 5600X      │
-│ GPU      │ NVIDIA RTX 3060        │
-│ RAM      │ 16GB DDR4-3200         │
-│ Storage  │ 512GB NVMe SSD         │
-│ PSU      │ 650W Bronze            │
-└──────────┴────────────────────────┘
-[This configuration has been checked for full compatibility]
+💻 Recommended Build:
 
-____________________________________________________________________________________
+CPU: AMD Ryzen 7 5800X - $349
+✓ Great for video editing with 8 cores/16 threads
+✓ Strong single-core performance for gaming
 
-Step 5: Customizing Components with Compatibility Feedback
+GPU: NVIDIA RTX 3060 Ti - $399
+✓ CUDA acceleration for Premiere Pro
+✓ Capable of 1440p gaming
 
-Which component would you like to change?
+RAM: 32GB DDR4-3600 - $159
+✓ Optimal for video editing workloads
+✓ Handles multiple applications easily
+
+Storage: 1TB NVMe SSD - $119
+✓ Fast project loading
+✓ Quick render times
+
+Power Supply: 750W Gold - $109
+✓ Efficient and reliable power delivery
+✓ Room for future upgrades
+
+Total: $1,135
+
+Would you like to proceed with this build? (Yes/No)
+User input: "Yes"
+```
+
+### 5. Component Customization
+```
+Would you like to modify any components?
+
 1. CPU
 2. GPU
 3. RAM
 4. Storage
->
+5. Power Supply
+6. Continue with current build
 
-Choose a New GPU:
-Select a GPU option:
+User input: "2"
 
-1. NVIDIA RTX 3060 Ti - $450
-2. AMD RX 6700 XT - $400
-3. NVIDIA RTX 3070 - $600
+Available GPU Alternatives:
+1. NVIDIA RTX 3070 - $599
+   + 20% better rendering performance
+   - Exceeds current budget
 
-____________________________________________________________________________________
+2. AMD RX 6700 XT - $479
+   + Similar gaming performance
+   - Less efficient for Adobe suite
 
-Step 6: Compatibility Check for Adjustment
-(  If Compatible:  )
+3. Keep current: RTX 3060 Ti - $399
 
-GPU updated to NVIDIA RTX 3070.
+Select an option (1-3):
+User input: "1"
+```
 
---- Compatibility Check ---
-This change is fully compatible with the existing build.
+### 6. Compatibility Check
+```
+GPU updated to NVIDIA RTX 3070
 
+⚠️ Compatibility Warning:
+Current 650W PSU insufficient for RTX 3070
+Recommendation: Upgrade to 750W minimum
 
-(  If Incompatible: )
-
-GPU updated to NVIDIA RTX 3070.
-
---- Compatibility Check ---
-Compatibility Warning: The selected GPU is not fully compatible with the current PSU.
-
-- **Issue**: The NVIDIA RTX 3070 requires additional power. The current PSU (650W Bronze) may not be sufficient for stable performance.
-- **Suggested Solution**: Upgrade the PSU to a minimum of 750W to ensure adequate power.
-
-Would you like to:
-1. Adjust PSU based on recommendation
-2. Select a different GPU
+Options:
+1. Auto-adjust PSU (adds $40)
+2. Choose different GPU
 3. Proceed anyway (not recommended)
 
-____________________________________________________________________________________
+User input: "1"
 
-Step 7: Finalize, Save, or Adjust Further
-Save or Make Further Adjustments:
+✅ Changes applied:
+- GPU updated to RTX 3070
+- PSU upgraded to 750W Gold
+Total cost increase: $240
+```
 
-Here's your updated build:
+### 7. Final Review
+```
+💻 Final Build Review:
 
-┌──────────┬────────────────────────┐
-│ Component│ Selected Part          │
-├──────────┼────────────────────────┤
-│ CPU      │ AMD Ryzen 5 5600X      │
-│ GPU      │ NVIDIA RTX 3070        │
-│ RAM      │ 16GB DDR4-3200         │
-│ Storage  │ 512GB NVMe SSD         │
-│ PSU      │ 750W Gold              │
-└──────────┴────────────────────────┘
+Custom Content Creation Build
+Total Cost: $1,375
 
 Would you like to:
 1. Save this build
-2. Return to main menu
-3. Exit without saving
+2. Return to component selection
+3. Start over
+4. Exit
 
-____________________________________________________________________________________
+User input: "1"
+
+Build saved successfully! You can access it later from the main menu.
+Would you like to return to the main menu? (Yes/No)
+User input: "Yes"
+```
