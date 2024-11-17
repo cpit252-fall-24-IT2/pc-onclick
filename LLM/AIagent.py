@@ -29,11 +29,9 @@ class AIAgentManager(AgentManager):
         return AIAgent(api_key=self.api_key)
 
 
-
-
 class AIAgent(BaseAIAgent):
     # Implement the select_component and check_compatibility methods
-    def __init__(self, api_key ):
+    def __init__(self, api_key):
         super().__init__(api_key)
         self.llm = LangChainOpenAI(api_key=api_key)
 
@@ -53,6 +51,17 @@ class AIAgent(BaseAIAgent):
             llm=self.llm,
             prompt=self.check_compatibility_prompt
         )
+        # Budget allocation prompt
+        self.budget_allocation_prompt = PromptTemplate(
+            input_variables=["budget", "usage"],
+            template="You are a budget allocation assistant for building a PC. The user has a budget of {budget} and plans to use the PC for {usage}. Based on this information, allocate the budget for each component (CPU, GPU, Motherboard, RAM, Storage, and PSU) and return the budget as a Python dictionary in this exact format:\n\n"
+                     "{'CPU': amount, 'GPU': amount, 'Motherboard': amount, 'RAM': amount, 'Storage': amount, 'PSU': amount}\n\n"
+                     "Only return the dictionary, nothing else."
+        )
+        self.budget_allocation_chain = LLMChain(
+            llm=self.llm,
+            prompt=self.budget_allocation_prompt
+        )
     def select_component(self, user_input):
         response = self.select_component_chain.invoke(user_input)
         component_name = response['text'].strip()
@@ -62,14 +71,6 @@ class AIAgent(BaseAIAgent):
         response = self.check_compatibility_chain.invoke(user_input)
         compatibility = response['text'].strip()
         return compatibility
-
-
-
-
-
-
-
-
 
 
 # Create an instance of the AIAgentManager JUST FOR *TESTING*
