@@ -1,10 +1,13 @@
 import os
+
+from dotenv import load_dotenv
 from langchain.chains import LLMChain
-from langchain.prompts import PromptTemplate
 from langchain.llms import OpenAI as LangChainOpenAI
-from baseAiAgent import BaseAIAgent
+from langchain.prompts import PromptTemplate
+
 from baseAiAgent import AgentManager
-from dotenv import load_dotenv, find_dotenv
+from baseAiAgent import BaseAIAgent
+from data.web_data_set import PCComponentFetcher
 
 
 class AIAgentManager(AgentManager):
@@ -55,7 +58,7 @@ class AIAgent(BaseAIAgent):
         self.budget_allocation_prompt = PromptTemplate(
             input_variables=["budget", "usage"],
             template="You are a budget allocation assistant for building a PC. The user has a budget of {budget} and plans to use the PC for {usage}. Based on this information, allocate the budget for each component (CPU, GPU, Motherboard, RAM, Storage, and PSU) and return the budget as a Python dictionary in this exact format:\n\n"
-                     "{'CPU': amount, 'GPU': amount, 'Motherboard': amount, 'RAM': amount, 'Storage': amount, 'PSU': amount}\n\n"
+                     "\n\n"
                      "Only return the dictionary, nothing else."
         )
         self.budget_allocation_chain = LLMChain(
@@ -72,6 +75,24 @@ class AIAgent(BaseAIAgent):
         compatibility = response['text'].strip()
         return compatibility
 
+    def budget_allocation(self, budget, usage):
+        # Prepare the input for the chain
+        input_data = {"budget": budget, "usage": usage}
+
+        # Debugging: Print the input data
+        print("Input Data to Chain:", input_data)
+
+        # Invoke the chain
+        response = self.budget_allocation_chain.invoke(input_data)
+
+        # Parse and return the dictionary
+        try:
+            budget_dict = eval(response['text'].strip())  # Convert response to dictionary
+        except Exception as e:
+            raise ValueError(f"Error parsing budget allocation response: {response['text']}") from e
+
+        return budget_dict
+
 
 # Create an instance of the AIAgentManager JUST FOR *TESTING*
 agent_manager = AIAgentManager()
@@ -83,7 +104,11 @@ compatibility_input = "I have selected a GTX 1660 and a Ryzen 5 CPU. Are they co
 # Interact with the agent
 selected_component = agent_manager.agent.select_component(component_input)
 compatibility = agent_manager.agent.check_compatibility(compatibility_input)
+allocation = agent_manager.agent.budget_allocation(10000,"gaming")
+print(allocation)
+print(f"Type of allocation: {type(allocation)}")
 
-# Output the results
-print(f"Selected Component: {selected_component}")
-print(f"Compatibility: {compatibility}")
+print(f"CPU Allocation: {allocation.get('CPU', 'CPU not found')}")
+print(allocation.get('GPU'))
+fetcher = PCComponentFetcher()
+print(fetcher.get_component('RAM', budget=allocation.get('RAM'), manufacturer=''))
