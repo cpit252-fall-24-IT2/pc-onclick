@@ -9,7 +9,7 @@ from data.web_data_set import PCComponentFetcher
 
 class BaseAIAgent(ABC):
     def __init__(self):
-        
+        super().__init__()  # Call the parent class constructor
 
     @abstractmethod
     def select_component(self, user_input):
@@ -116,16 +116,8 @@ class AIAgent(BaseAIAgent):
 # Create an instance of the AIAgent JUST FOR *TESTING*
 agent = AIAgent(model_name='llama3.2')  # Pass the model_name
 
-# Example user inputs
-input_data = {
-    "user_input": "I need a graphics card.",
-    "budget": "$1550",
-    "preferences": "gaming"
-}
-compatibility_input = "I have selected a GTX 1660 and a Ryzen 5 CPU. Are they compatible?"
 
-# Interact with the agent
-
+# Example usage
 allocation = agent.budget_allocation(1500, "editing")
 print(allocation)
 print(f"Type of allocation: {type(allocation)}")
