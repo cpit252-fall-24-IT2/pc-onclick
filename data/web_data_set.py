@@ -1,9 +1,23 @@
 import requests
 import pandas as pd
 from io import StringIO
-from baseComponentRetrieval import baseComponentRetrieval
+from abc import ABC, abstractmethod
+
+class baseComponentRetrieval(ABC):
+    @abstractmethod
+    def get_best_options(self, url, budget=None, manufacturer=None, columns=None):
+        pass
+
+    @abstractmethod
+    def get_component(self, component_type, budget, manufacturer):
+        pass
 
 class PCComponentFetcher(baseComponentRetrieval):
+
+    def fetch_data():
+        # Your implementation here
+        return "Data fetched from web_data_set"
+    
     def get_best_options(self, url, budget=None, manufacturer=None, columns=None):
         response = requests.get(url)
         
@@ -35,17 +49,16 @@ class PCComponentFetcher(baseComponentRetrieval):
         if columns:
             top_options = top_options[columns]
          
-        print(type(top_options))
-        return top_options
+        return top_options , df['price'].min(), df['price'].max()
 
-    def get_component(self, component_type, budget, manufacturer):
+    def get_url_and_columns(self, component_type):
         if component_type == 'CPU':
             url = 'https://raw.githubusercontent.com/docyx/pc-part-dataset/main/data/csv/cpu.csv'
             columns = ['name', 'price', 'core_count']
         elif component_type == 'GPU':
             url = 'https://raw.githubusercontent.com/docyx/pc-part-dataset/main/data/csv/video-card.csv'
             columns = ['name', 'price', 'chipset']
-        elif component_type == 'motherboard':
+        elif component_type == 'Motherboard':
             url = 'https://raw.githubusercontent.com/docyx/pc-part-dataset/main/data/csv/motherboard.csv'
             columns = ['name', 'price', 'socket']
         elif component_type == 'PSU':
@@ -54,19 +67,22 @@ class PCComponentFetcher(baseComponentRetrieval):
         elif component_type == 'RAM':
             url = 'https://raw.githubusercontent.com/docyx/pc-part-dataset/main/data/csv/memory.csv'
             columns = ['name', 'price', 'speed', 'modules', 'first_word_latency', 'cas_latency']
+        elif component_type == 'Storage':
+            url = 'https://raw.githubusercontent.com/docyx/pc-part-dataset/main/data/csv/internal-hard-drive.csv'
+            columns = ['name', 'price', 'capacity', 'type', 'form_factor', 'interface']
         else:
             raise ValueError(f"Unknown component type: {component_type}")
-        
-        return self.get_best_options(url, budget, manufacturer, columns)
+        return url, columns
 
-# Display the results
+    def get_component(self, component_type, budget, manufacturer):
+        url, columns = self.get_url_and_columns(component_type)
+        top_options, min_price, max_price = self.get_best_options(url, budget, manufacturer, columns)
+        return top_options, min_price, max_price
+
+    def get_price_ranges(self, component_type):
+        url, _ = self.get_url_and_columns(component_type)
+        _, min_price, max_price = self.get_best_options(url)
+        return min_price, max_price
+
 fetcher = PCComponentFetcher()
-try:
-    print(fetcher.get_component('RAM', budget=30, manufacturer=''))
-    print(fetcher.get_component('CPU', budget=100, manufacturer=''))    
-    print(fetcher.get_component('GPU', budget=2000000, manufacturer=''))
-    print(fetcher.get_component('motherboard', budget=170, manufacturer=''))
-    print(fetcher.get_component('PSU', budget=50, manufacturer=''))
-except ValueError as e:
-    print(e)
-
+print(fetcher.get_price_ranges('GPU'))
