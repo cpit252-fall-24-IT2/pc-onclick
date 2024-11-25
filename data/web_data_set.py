@@ -2,6 +2,7 @@ import requests
 import pandas as pd
 from io import StringIO
 from abc import ABC, abstractmethod
+import logging
 
 class baseComponentRetrieval(ABC):
     @abstractmethod
@@ -84,5 +85,25 @@ class PCComponentFetcher(baseComponentRetrieval):
         _, min_price, max_price = self.get_best_options(url)
         return min_price, max_price
 
+    def get_component_details(self, component_type, component_name):
+        url, columns = self.get_url_and_columns(component_type)
+        response = requests.get(url)
+        
+        if response.status_code != 200:
+            raise ValueError(f"Failed to fetch data from {url}. Status code: {response.status_code}")
+
+        csv_data = response.content.decode('utf-8')
+        df = pd.read_csv(StringIO(csv_data))
+        
+        logging.info(f"Searching for component: {component_name} in {component_type} dataset")
+        component_details = df[df['name'].str.contains(component_name, case=False, na=False)]
+        
+        if component_details.empty:
+            raise ValueError(f"No details found for component: {component_name}")
+        
+        return component_details.iloc[0].to_dict()
+
+# Enable logging
+logging.basicConfig(level=logging.INFO)
+
 fetcher = PCComponentFetcher()
-print(fetcher.get_price_ranges('GPU'))

@@ -2,16 +2,16 @@
 import requests
 import pandas as pd
 from io import StringIO
-from data import baseComponentRetrieval  # Use relative import
+from data.web_data_set import baseComponentRetrieval  # Use relative import
 
-from LLM.AIagent import AIAgentManager
+from user_preferences.user_preferences import UserPreferences
 
 def main():
     # Create an instance of the AIAgentManager JUST FOR *TESTING*
-    agent_manager = AIAgentManager()
 
+    user = UserPreferences()
+    print(user.user_choice_())
     # Example usage
-    print(agent_manager.agent.fetch_web_data())
 
 if __name__ == "__main__":
     main()

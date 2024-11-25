@@ -1,8 +1,8 @@
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from ..pc.pc import PCBuilder
-from ..pc.pc import PC
+from pc.pc import PCBuilder
+from pc.pc import PC
 
 
 class UserPreferences:
@@ -44,6 +44,7 @@ class UserPreferences:
         print("\nDefine Your Budget:")
         self.budget = input("Enter your budget : ")
         
+        
 
         
 
@@ -51,6 +52,7 @@ class UserPreferences:
 #example builds
 
     def initialize_example_builds(self):
+        
         # Create PC objects for each example build using the PCBuilder class
         gaming_build = PCBuilder().set_cpu("AMD Ryzen 5 5600X", 199, 6).set_gpu("NVIDIA RTX 3060 Ti", 399, "Ampere").set_ram(
             "Corsair Vengeance LPX 16GB DDR4-3200", 79, 16, 3200, "DDR4"
@@ -68,3 +70,4 @@ class UserPreferences:
 
 fitcher = UserPreferences()
 fitcher.initialize_example_builds()
+
