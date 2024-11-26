@@ -153,21 +153,44 @@ class AIAgent(BaseAIAgent):
         return component_details
 
 
+
+
+#Test  
+
 # Example usage
 agent = AIAgent(model_name='llama3.2')
 
 # Budget Allocation Example
-allocation = agent.budget_allocation(1500, "gaming")
+allocation = agent.budget_allocation(3000, "gaming")
 print("\n\n\n\n\n\n\n\n")
 print(allocation['CPU'])
+print(allocation['GPU'])
+print(allocation['Motherboard'])
+print(allocation['PSU'])
+print(allocation['RAM'])
+print(allocation['Storage'])
 
 
-
+fetcher = PCComponentFetcher()
+###
 components = agent.fetch_component(allocation)  
-print(components.CPU)
-print("\n\n\n\n\n\n\n\n")
-X = agent.select_component(components, "gaming")
-print(X.CPU)
+print(fetcher.get_component_details('CPU', "Intel Core i7-14700F"))
+#print(fullinfo.CPU)
+#print(fullinfo.GPU)
+#print(fullinfo.Motherboard)
+#print(fullinfo.PSU)
+#print(fullinfo.RAM)
+#print(fullinfo.Storage)
+
+#bestComp = agent.select_component(components, "gaming")
+#print(bestComp.CPU)
+#print(bestComp.GPU)
+#print(bestComp.Motherboard)
+#print(bestComp.PSU)
+#print(betComp.RAM)
+#print(bestComp.Storage)
+
+
 
 
 

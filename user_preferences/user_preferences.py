@@ -1,6 +1,7 @@
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from LLM.AIagent import AIAgent
 from pc.pc import PCBuilder
 from pc.pc import PC
 
@@ -62,12 +63,29 @@ class UserPreferences:
             "EVGA 600W 80+ Bronze", 49, "80+ Bronze", 600, False
         ).build() 
 
-        print(gaming_build) 
+    
         # Store builds as a list of PC objects
         return [gaming_build]
 
 
 
-fitcher = UserPreferences()
-fitcher.initialize_example_builds()
+
+# Example usage
+agent = AIAgent(model_name='llama3.2')
+
+# Budget Allocation Example
+allocation = agent.budget_allocation(3000, "gaming")
+components = agent.fetch_component(allocation)  
+print("/n/n/n/n")
+print(components)
+print("/n/n/n/n")
+
+Comp = agent.select_component(components, "gaming")
+print(Comp.CPU)
+print(Comp.GPU)
+print(Comp.Motherboard)
+print(Comp.PSU)
+print(Comp.RAM)
+print(Comp.Storage)
+
 

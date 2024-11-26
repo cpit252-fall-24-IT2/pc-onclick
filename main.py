@@ -10,8 +10,8 @@ def main():
     # Create an instance of the AIAgentManager JUST FOR *TESTING*
 
     user = UserPreferences()
-    print(user.user_choice_())
+    user.user_choice_()
     # Example usage
-
+1
 if __name__ == "__main__":
     main()
