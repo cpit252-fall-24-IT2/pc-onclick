@@ -4,7 +4,6 @@ import sys
 import os
 import json
 from abc import ABC, abstractmethod
-
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from langchain_ollama import OllamaLLM
 from langchain.prompts import PromptTemplate
@@ -57,17 +56,17 @@ class AIAgent(BaseAIAgent):
         self.select_component_prompt = PromptTemplate(
             input_variables=["components", "usage"],
             template=(
-                """**Respond only with a Python dictionary format in this exact format:** no there text, nothing else. Your Role is to select PC components. Based on the user's components {components} and usage {usage}, 
-                select the best component for each category in components that are compatible with each other.\n\n
-                {{
-                    "CPU": "name",
-                    "GPU": "chipset",
-                    "Motherboard": "name",
-                    "PSU": "name",
-                    "RAM": "name",
-                    "Storage": "name"
-                }}
-                """
+            """**Respond only with a Python dictionary format in this exact format:** no there text, nothing else. Your Role is to select PC components. Based on the user's components {components} and usage {usage}, 
+            select the best component for each category in components that are compatible with each other.\n\n
+            {{
+                "CPU": "name",
+                "GPU": "chipset",
+                "Motherboard": "name",
+                "PSU": "name",
+                "RAM": "name",
+                "Storage": "name"
+            }}
+            """
             )
         )
 
@@ -82,25 +81,25 @@ class AIAgent(BaseAIAgent):
         self.budget_allocation_prompt = PromptTemplate(
             input_variables=["budget", "usage"],
             template=(
-                "As a PC expert, you are tasked with allocating a budget of: ${budget} \nfor a PC used for {usage}."
-                "Split the budget {budget} for a PC used for {usage}."
-                "Return a Python dictionary in this format:\n\n- **Respond only with a Python dictionary in this exact format:**"
-                "{{\n"
-                "    'CPU': amount,\n"
-                "    'GPU': amount,\n"
-                "    'Motherboard': amount,\n"
-                "    'RAM': amount,\n"
-                "    'Storage': amount,\n"
-                "    'PSU': amount\n"
-                "}}\n"
-                "Only return the dictionary."
+            "As a PC expert, you are tasked with allocating a budget of: ${budget} \nfor a PC used for {usage}."
+            "Split the budget {budget} for a PC used for {usage}."
+            "Return a Python dictionary in this format:\n\n- **Respond only with a Python dictionary in this exact format:**"
+            "{{\n"
+            "    'CPU': amount,\n"
+            "    'GPU': amount,\n"
+            "    'Motherboard': amount,\n"
+            "    'RAM': amount,\n"
+            "    'Storage': amount,\n"
+            "    'PSU': amount\n"
+            "}}\n"
+            "Only return the dictionary."
             )
         )
 
     def select_component(self, components: ComponentOutput, usage: str) -> ComponentOutput:
         # Convert ComponentOutput to dictionary for prompt
         components_dict = components.model_dump()
-
+        
         input_data = ComponentSelectionInput(
             components={
                 "CPU": components.CPU,
@@ -112,7 +111,7 @@ class AIAgent(BaseAIAgent):
             },
             usage=usage
         )
-
+        
         prompt = self.select_component_prompt.format(**input_data.dict())
         response = self.llm.invoke(prompt)
         print(response)
@@ -121,7 +120,7 @@ class AIAgent(BaseAIAgent):
             component_dict = ComponentOutput(**ast.literal_eval(response.strip()))
         except Exception as e:
             raise ValueError(f"Invalid component response: {response}") from e
-
+            
         return component_dict
 
     def check_compatibility(self, user_input: str) -> str:
@@ -152,7 +151,7 @@ class AIAgent(BaseAIAgent):
 
     def fetch_component(self, budget_dict: Dict[str, float]) -> ComponentOutput:
         fetcher = PCComponentFetcher()
-
+        
         # Get component data and extract first item (name) from each tuple
         components = {
             'CPU': str(fetcher.get_component('CPU', budget_dict['CPU'], manufacturer='')),
@@ -162,7 +161,7 @@ class AIAgent(BaseAIAgent):
             'RAM': str(fetcher.get_component('RAM', budget_dict['RAM'], manufacturer='')),
             'Storage': str(fetcher.get_component('Storage', budget_dict['Storage'], manufacturer=''))
         }
-
+        
         return ComponentOutput(**components)
 
     def get_full_component_details(self, selected_components: ComponentOutput) -> Dict[str, Dict[str, Any]]:
@@ -179,7 +178,9 @@ class AIAgent(BaseAIAgent):
         return component_details
 
 
-# Test
+
+
+#Test  
 
 # Example usage
 agent = AIAgent(model_name='llama3.2')
@@ -189,10 +190,15 @@ allocation = agent.budget_allocation(1500, "gaming")
 print("\n\n\n\n\n\n\n\n")
 print(allocation['CPU'])
 
-components = agent.fetch_component(allocation)
+
+
+components = agent.fetch_component(allocation)  
 print(components.CPU)
 print("\n\n\n\n\n\n\n\n")
 X = agent.select_component(components, "gaming")
 print(X.CPU)
+
+
+
 
 ## only now we need to make code in web_data_set.py so we can get the full information from the CSV files.
