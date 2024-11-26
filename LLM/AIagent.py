@@ -1,114 +1,175 @@
+from pydantic import BaseModel, Field, ValidationError
+from typing import Dict, Optional, Any
+import sys
 import os
-
-from dotenv import load_dotenv
-from langchain.chains import LLMChain
-from langchain.llms import OpenAI as LangChainOpenAI
+import json
+from abc import ABC, abstractmethod
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from langchain_ollama import OllamaLLM
 from langchain.prompts import PromptTemplate
-
-from baseAiAgent import AgentManager
-from baseAiAgent import BaseAIAgent
 from data.web_data_set import PCComponentFetcher
+import ast
 
 
-class AIAgentManager(AgentManager):
-    # Implement the load_api_key method
-
-    def __init__(self, env_dir='LLM', env_file='.env', api_key_var='OPENAI_API_KEY'):
-        self.dotenv_path = os.path.join(os.getcwd(), env_dir, env_file)
-        self.api_key_var = api_key_var
-        self.api_key = self.load_api_key()
-        self.agent = self.initialize_agent()
-
-    def load_api_key(self):
-        # Load the API key from the .env file
-        load_dotenv(self.dotenv_path)
-        api_key = os.getenv(self.api_key_var)
-        if not api_key:
-            raise ValueError(f"API key not found. Please set the {self.api_key_var} environment variable.")
-        return api_key
-
-    def initialize_agent(self):
-        # Initialize the AI agent with the API key
-        return AIAgent(api_key=self.api_key)
+# Pydantic Models
+class BudgetAllocationInput(BaseModel):
+    budget: float
+    usage: str
 
 
+class ComponentSelectionInput(BaseModel):
+    components: Dict[str, Any]
+    usage: str
+
+
+class ComponentCompatibilityInput(BaseModel):
+    user_input: str
+
+
+class ComponentOutput(BaseModel):
+    CPU: str
+    GPU: str
+    Motherboard: str
+    PSU: str
+    RAM: str
+    Storage: str
+
+
+# Abstract Base Class
+class BaseAIAgent(ABC):
+    @abstractmethod
+    def select_component(self, user_input: ComponentSelectionInput) -> ComponentOutput:
+        pass
+
+    @abstractmethod
+    def check_compatibility(self, user_input: ComponentCompatibilityInput) -> str:
+        pass
+
+
+# Main AIAgent Class
 class AIAgent(BaseAIAgent):
-    # Implement the select_component and check_compatibility methods
-    def __init__(self, api_key):
-        super().__init__(api_key)
-        self.llm = LangChainOpenAI(api_key=api_key)
+    def __init__(self, model_name='llama3.2'):
+        self.model_name = model_name
+        self.llm = OllamaLLM(model=self.model_name)
 
+        # Define prompts
         self.select_component_prompt = PromptTemplate(
-            input_variables=["user_input"],
-            template="You are a PC component recommendation assistant. Based on the user's budget and preferences, suggest the best component. Only provide the name of the component.\nUser: {user_input}\nAssistant:"
+            input_variables=["components", "usage"],
+            template=(
+                "You are a PC component selection assistant. Based on the user's components {components} and usage {usage}, "
+                "select the best component for each category (CPU, GPU, Motherboard, RAM, Storage, and PSU).that are compatible with each other.\n\n"
+                "Return the selected components as a Python dictionary in this exact format:\n\n"
+                "Only return the dictionary, nothing else."
+            )
         )
-        self.select_component_chain = LLMChain(
-            llm=self.llm,
-            prompt=self.select_component_prompt
-        )
+
         self.check_compatibility_prompt = PromptTemplate(
             input_variables=["user_input"],
-            template="You are a PC component compatibility assistant. Based on the user's selected components, check if they are compatible. Only provide a yes or no answer.\nUser: {user_input}\nAssistant:"
+            template=(
+                "You are a PC component compatibility assistant. Based on the user's selected components, "
+                "check if they are compatible. Only provide a yes or no answer.\nUser: {user_input}\nAssistant:"
+            )
         )
-        self.check_compatibility_chain = LLMChain(
-            llm=self.llm,
-            prompt=self.check_compatibility_prompt
-        )
-        # Budget allocation prompt
+
         self.budget_allocation_prompt = PromptTemplate(
             input_variables=["budget", "usage"],
-            template="You are a budget allocation assistant for building a PC. The user has a budget of {budget} and plans to use the PC for {usage}. Based on this information, allocate the budget for each component (CPU, GPU, Motherboard, RAM, Storage, and PSU) and return the budget as a Python dictionary in this exact format:\n\n"
-                     "\n\n"
-                     "Only return the dictionary, nothing else."
+            template=(
+                "You are a budget allocation assistant for building a PC. The user has a budget of {budget} and plans to use the PC for {usage}. Based on this information, allocate the budget for each component (CPU, GPU, Motherboard, RAM, Storage, and PSU) and return the budget as a Python dictionary in this exact format:\n\n"
+                "Only return the dictionary, nothing else."
+            )
         )
-        self.budget_allocation_chain = LLMChain(
-            llm=self.llm,
-            prompt=self.budget_allocation_prompt
+
+    def select_component(self, components: ComponentOutput, usage: str) -> ComponentOutput:
+        # Convert ComponentOutput to dictionary for prompt
+        components_dict = components.model_dump()
+        
+        input_data = ComponentSelectionInput(
+            components=components_dict,
+            usage=usage
         )
-    def select_component(self, user_input):
-        response = self.select_component_chain.invoke(user_input)
-        component_name = response['text'].strip()
-        return component_name
-
-    def check_compatibility(self, user_input):
-        response = self.check_compatibility_chain.invoke(user_input)
-        compatibility = response['text'].strip()
-        return compatibility
-
-    def budget_allocation(self, budget, usage):
-        # Prepare the input for the chain
-        input_data = {"budget": budget, "usage": usage}
-
-        # Debugging: Print the input data
-        print("Input Data to Chain:", input_data)
-
-        # Invoke the chain
-        response = self.budget_allocation_chain.invoke(input_data)
-
-        # Parse and return the dictionary
+        
+        prompt = self.select_component_prompt.format(**input_data.dict())
+        response = self.llm.invoke(prompt)
+        response = response.strip().strip('```python').strip('```')
         try:
-            budget_dict = eval(response['text'].strip())  # Convert response to dictionary
+            component_dict = ComponentOutput(**ast.literal_eval(response.strip()))
         except Exception as e:
-            raise ValueError(f"Error parsing budget allocation response: {response['text']}") from e
+            raise ValueError(f"Invalid component response: {response}") from e
+            
+        return component_dict
 
+    def check_compatibility(self, user_input: str) -> str:
+        input_data = ComponentCompatibilityInput(user_input=user_input)
+        prompt = self.check_compatibility_prompt.format(user_input=input_data.user_input)
+        response = self.llm.invoke(prompt)
+        return response.strip()
+
+    def budget_allocation(self, budget: float, usage: str) -> Dict[str, float]:
+        input_data = BudgetAllocationInput(budget=budget, usage=usage)
+        prompt = self.budget_allocation_prompt.format(**input_data.dict())
+        response = self.llm.invoke(prompt)
+        try:
+            budget_dict = eval(response.strip())
+        except Exception as e:
+            raise ValueError(f"Error parsing budget allocation response: {response}") from e
         return budget_dict
 
+    def check_budget(self, budget: Dict[str, float]) -> str:
+        fetcher = PCComponentFetcher()
+        components = ['CPU', 'GPU', 'Motherboard', 'PSU', 'RAM', 'Storage']
+        for component in components:
+            min_price, max_price = fetcher.get_price_ranges(component)
+            component_budget = budget.get(component)
+            if component_budget is None or component_budget < min_price or component_budget > max_price:
+                return "fail"
+        return "pass"
 
-# Create an instance of the AIAgentManager JUST FOR *TESTING*
-agent_manager = AIAgentManager()
+    def fetch_component(self, budget_dict: Dict[str, float]) -> ComponentOutput:
+        fetcher = PCComponentFetcher()
+        
+        # Get component data and extract first item (name) from each tuple
+        components = {
+            'CPU': str(fetcher.get_component('CPU', budget_dict['CPU'], manufacturer='')),
+            'GPU': str(fetcher.get_component('GPU', budget_dict['GPU'], manufacturer='')),
+            'Motherboard': str(fetcher.get_component('Motherboard', budget_dict['Motherboard'], manufacturer='')),
+            'PSU': str(fetcher.get_component('PSU', budget_dict['PSU'], manufacturer='')),
+            'RAM': str(fetcher.get_component('RAM', budget_dict['RAM'], manufacturer='')),
+            'Storage': str(fetcher.get_component('Storage', budget_dict['Storage'], manufacturer=''))
+        }
+        
+        return ComponentOutput(**components)
 
-# Example user inputs
-component_input = "I have a budget of $150 for a graphics card."
-compatibility_input = "I have selected a GTX 1660 and a Ryzen 5 CPU. Are they compatible?"
+    def get_full_component_details(self, selected_components: ComponentOutput) -> Dict[str, Dict[str, Any]]:
+        fetcher = PCComponentFetcher()
+        component_details = {}
 
-# Interact with the agent
-selected_component = agent_manager.agent.select_component(component_input)
-compatibility = agent_manager.agent.check_compatibility(compatibility_input)
-allocation = agent_manager.agent.budget_allocation(10000,"gaming")
-print(allocation)
-print(f"Type of allocation: {type(allocation)}")
+        component_details['CPU'] = fetcher.get_component_details('CPU', selected_components.CPU)
+        component_details['GPU'] = fetcher.get_component_details('GPU', selected_components.GPU)
+        component_details['Motherboard'] = fetcher.get_component_details('Motherboard', selected_components.Motherboard)
+        component_details['PSU'] = fetcher.get_component_details('PSU', selected_components.PSU)
+        component_details['RAM'] = fetcher.get_component_details('RAM', selected_components.RAM)
+        component_details['Storage'] = fetcher.get_component_details('Storage', selected_components.Storage)
 
-print(f"CPU Allocation: {allocation.get('CPU', 'CPU not found')}")
-print(allocation.get('GPU'))
-fetcher = PCComponentFetcher()
-print(fetcher.get_component('RAM', budget=allocation.get('RAM'), manufacturer=''))
+        return component_details
+
+
+# Example usage
+agent = AIAgent(model_name='llama3.2')
+
+# Budget Allocation Example
+allocation = agent.budget_allocation(1500, "gaming")
+print("\n\n\n\n\n\n\n\n")
+print(allocation['CPU'])
+
+
+
+components = agent.fetch_component(allocation)  
+print(components.CPU)
+print("\n\n\n\n\n\n\n\n")
+X = agent.select_component(components, "gaming")
+print(X.CPU)
+
+
+
+
+## only now we need to make code in web_data_set.py so we can get the full information from the CSV files.

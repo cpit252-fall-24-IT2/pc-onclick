@@ -1,9 +1,9 @@
-from cpu import CPU
-from gpu import GPU
-from motherboard import Motherboard
-from PSU import PSU
-from RAM import RAM
-from storage import Storage
+from pc.cpu import CPU
+from pc.gpu import GPU
+from pc.motherboard import Motherboard
+from pc.PSU import PSU
+from pc.RAM import RAM
+from pc.storage import Storage
 
 class PC:
     def __init__(self, cpu=None, gpu=None, motherboard=None, psu=None, ram=None, storage=None):
