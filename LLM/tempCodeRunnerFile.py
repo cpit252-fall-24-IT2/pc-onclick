@@ -1,12 +1,13 @@
 from pydantic import BaseModel, Field, ValidationError
 from typing import Dict, Optional, Any
 import logging
+
 import sys
 import os
 import json
 from abc import ABC, abstractmethod
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from langchain_ollama import OllamaLLM
+from langchain.llms import Ollama
 from langchain.prompts import PromptTemplate
 from data.web_data_set import PCComponentFetcher
 import ast
@@ -51,13 +52,13 @@ class BaseAIAgent(ABC):
 class AIAgent(BaseAIAgent):
     def __init__(self, model_name='llama3.2'):
         self.model_name = model_name
-        self.llm = OllamaLLM(model=self.model_name)
+        self.llm = Ollama(model=self.model_name)
 
         # Define prompts
         self.select_component_prompt = PromptTemplate(
             input_variables=["components", "usage"],
             template=(
-            """**Respond only with a Python dictionary format in this exact format:** no there text, nothing else. Your Role is to select PC components that is compatible. Based on the user's components {components} and usage {usage}, 
+            """**Respond only with a Python dictionary format in this exact format:** no there text, nothing else. Your Role is to select PC components. Based on the user's components {components} and usage {usage}, 
             select the best component for each category in components that are compatible with each other.\n\n
             {{
                 "CPU": "name",
@@ -74,11 +75,9 @@ class AIAgent(BaseAIAgent):
         self.check_compatibility_prompt = PromptTemplate(
             input_variables=["components"],
             template=(
-            "Determine if the following PC components are compatible (without being overly restrictive). The components are provided in JSON format:\n"
-            "{components}\n\n"
-            "You must respond only with one of the following options and nothing else:\n"
-            "- 'This PC is compatible.'\n"
-            "- 'This PC is not compatible because [brief reason].'\n"
+            "You are a PC component compatibility assistant. Based on the user's selected components provided in the following JSON format:\n"
+            "{components}\n"
+            "Check if the components are compatible. Respond with 'yes' if they are compatible, otherwise respond with 'no'."
             )
         )
 
@@ -102,7 +101,7 @@ class AIAgent(BaseAIAgent):
 
     def select_component(self, components: ComponentOutput, usage: str) -> ComponentOutput:
         # Convert ComponentOutput to dictionary for prompt
-        components_dict = components.model_dump()
+        # Removed unused variable components_dict
         
         input_data = ComponentSelectionInput(
             components={
@@ -116,38 +115,27 @@ class AIAgent(BaseAIAgent):
             usage=usage
         )
         
-        prompt = self.select_component_prompt.format(**input_data.dict())
+        prompt = self.select_component_prompt.format(**input_data.model_dump())
         response = self.llm.invoke(prompt)
-        response = response.strip().strip('```python').strip('```').strip()
-        if not response.endswith('}'):
-            raise ValueError(f"Incomplete component response: {response}")
+        print(response)
+        response = response.strip().strip('```python').strip('```')
         try:
-            component_dict = ComponentOutput(**ast.literal_eval(response.strip()))
-        except Exception as e:
+            component_dict = ComponentOutput(**json.loads(response))
+        except json.JSONDecodeError as e:
             raise ValueError(f"Invalid component response: {response}") from e
             
         return component_dict
 
-    def check_compatibility(self, components: Dict[str, Any]) -> str:
-        # components is already a dictionary
-        components_dict = components
-        # Convert the component from dict to str
-        components_str = json.dumps(components_dict)
-        
-        input_data = ComponentCompatibilityInput(components=components_str)
+    def check_compatibility(self, components: ComponentOutput) -> str:
+        # Convert ComponentOutput to JSON string for prompt
+        input_data = ComponentCompatibilityInput(components=json.dumps(components.model_dump()))
         prompt = self.check_compatibility_prompt.format(**input_data.model_dump())
         response = self.llm.invoke(prompt)
-        if "this pc is compatible" in response.lower():
-            return "this pc is compatible"
-        elif "this pc is not compatible" in response.lower():
-            return "this pc is not compatible"
-        else:
-            raise ValueError(f"Unexpected response format: {response}")
-
+        return response.strip()
 
     def budget_allocation(self, budget: float, usage: str) -> Dict[str, float]:
         input_data = BudgetAllocationInput(budget=budget, usage=usage)
-        prompt = self.budget_allocation_prompt.format(**input_data.dict())
+        prompt = self.budget_allocation_prompt.format(**input_data.model_dump())
         response = self.llm.invoke(prompt)
         try:
             budget_dict = eval(response.strip())
@@ -207,51 +195,40 @@ class AIAgent(BaseAIAgent):
 # Test
 
 # Example usage
-def main():
-    agent = AIAgent(model_name='llama3.2')
+agent = AIAgent(model_name='llama3.2')
 
-    # Budget Allocation Example
-    try:
-        allocation = agent.budget_allocation(1500, "I want something for editing videos")
-        print("Budget Allocation:", allocation)
-    except ValueError as e:
-        print(f"Error in budget allocation: {e}")
-        return
+# Budget Allocation Example
+allocation = agent.budget_allocation(1500, "gaming")
+print("\n\n")
+print(allocation['CPU'])
 
-    # Fetch Components
-    try:
-        component_dict, components_str = agent.fetch_component(allocation)
-        print("Fetched Components:", components_str.CPU, components_str.GPU, components_str.Motherboard, components_str.PSU, components_str.RAM, components_str.Storage)
-    except ValueError as e:
-        print(f"Error fetching components: {e}")
-        return
+component_dict, components_str = agent.fetch_component(allocation)
+print(type(components_str.GPU))
+print(type(components_str))
+print(components_str.GPU)
+print(components_str.CPU)
+print("\n\n")
+X = agent.select_component(components_str, "gaming")
 
-    # Select Components
-    try:
-        selected_components = agent.select_component(components_str, "I want something for editing videos")
-        print("Selected Components:", selected_components)
-    except ValueError as e:
-        print(f"Error selecting components: {e}")
-        return
+print(agent.check_compatibility(components_str))
+print(X.GPU)
+components_str = X  # Use the entire object, not just the CPU attribute
+components = agent.get_full_component_details(components_str)
 
-    # Get Full Component Details
-    try:
-        full_component_details = agent.get_full_component_details(selected_components)
-        print("Full Component Details:", full_component_details)
-    except ValueError as e:
-        print(f"Error getting full component details: {e}")
-        return
+print(agent.check_compatibility(components))
+print(type(components))
 
-    # Check Compatibility
-    try:
-        compatibility = agent.check_compatibility(full_component_details)
-        print("Compatibility Check:", compatibility)
-    except ValueError as e:
-        print(f"Error checking compatibility: {e}")
-        return
-
-if __name__ == "__main__":
-    main()
+print(components['CPU'])
+print("\n\n")
+print(components['GPU'])
+print("\n\n")
+print(components['Motherboard'])
+print("\n\n")
+print(components['PSU'])
+print("\n\n")
+print(components['RAM'])
+print("\n\n")
+print(components['Storage'])
 
 
 

@@ -2,6 +2,8 @@ import requests
 import pandas as pd
 from io import StringIO
 from abc import ABC, abstractmethod
+from typing import Dict, Any, Tuple
+
 import logging
 
 class baseComponentRetrieval(ABC):
@@ -19,7 +21,7 @@ class PCComponentFetcher(baseComponentRetrieval):
         # Your implementation here
         return "Data fetched from web_data_set"
     
-    def get_best_options(self, url, budget=None, manufacturer=None, columns=None):
+    def get_best_options(self, url: str, budget: float = None, manufacturer: str = None, columns: list = None) -> Tuple[pd.DataFrame, float, float]:
         response = requests.get(url)
         
         # Check if the request was successful
@@ -27,7 +29,6 @@ class PCComponentFetcher(baseComponentRetrieval):
             raise ValueError(f"Failed to fetch data from {url}. Status code: {response.status_code}")
 
         csv_data = response.content.decode('utf-8')
-
         df = pd.read_csv(StringIO(csv_data))
         
         # Filter by budget
@@ -45,12 +46,13 @@ class PCComponentFetcher(baseComponentRetrieval):
             df = df[df['name'].str.contains(manufacturer, case=False, na=False)]
 
         # Sort by price to get the top options within budget
-        top_options = df.sort_values(by='price').tail(10)
-
+        top_options = df.sort_values(by='price').head(10)
+        unique_columns = ['name']
+        top_options = top_options.drop_duplicates(subset=unique_columns, keep='first')
         if columns:
             top_options = top_options[columns]
-         
-        return top_options , df['price'].min(), df['price'].max()
+        
+        return top_options, df['price'].min(), df['price'].max()
 
     def get_url_and_columns(self, component_type):
         if component_type == 'CPU':

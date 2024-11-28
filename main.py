@@ -4,7 +4,7 @@ import pandas as pd
 from io import StringIO
 from data.web_data_set import baseComponentRetrieval  # Use relative import
 
-from user_preferences.user_preferences import UserPreferences
+from User.user_preferences import UserPreferences
 
 def main():
     # Create an instance of the AIAgentManager JUST FOR *TESTING*
