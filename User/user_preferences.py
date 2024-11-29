@@ -10,24 +10,24 @@ import threading
 class UserPreferences:
     def __init__(self):
         self.user_choice = None 
-        self.use_case = None
         self.budget = None
         self.build_preferences = {}
         self.agent = AIAgent(model_name='llama3.2')
+        self.saved_builds = []
 
     def user_choice_(self):
         print("Welcome to PC ONCLICK!")
-        self.user_choice = input("\nSelect an option to begin: \n 1. Start New Build  \n 2. View Saved Build \n 3. Exit\n> ")
-        if self.user_choice == '1':
-            self.get_user_preferences()
-        elif self.user_choice == '2':
-            self.view_saved_build()
-        elif self.user_choice == '3':
-            print("Exiting...")
-            sys.exit()
-        else:
-            print("Invalid choice. Please try again.")
-            self.user_choice_()
+        while True:
+            self.user_choice = input("\nSelect an option to begin: \n 1. Start New Build  \n 2. View Saved Build \n 3. Exit\n> ")
+            if self.user_choice == '1':
+                self.get_user_preferences()
+            elif self.user_choice == '2':
+                self.view_saved_build()
+            elif self.user_choice == '3':
+                print("Exiting...")
+                sys.exit()
+            else:
+                print("Invalid choice. Please try again.")
 
     def loading_animation(self, stop_event):
         # Unicode spinner characters for smooth animation
@@ -72,43 +72,57 @@ class UserPreferences:
         loading_thread.start()
 
         # Call AIAgent methods
+        #--------------------------------- AI Agent Methods ---------------------------------#
+        # Allocate budget
         allocation = self.agent.budget_allocation(self.budget, self.use_case)
+        # Fetch components
         components_dict, components_str = self.agent.fetch_component(allocation)
+        # Select components
         selected_components = self.agent.select_component(components_str, self.use_case)
+        # Get details
         full_component_details = self.agent.get_full_component_details(selected_components)
+        # Check compatibility
         compatibility = self.agent.check_compatibility(full_component_details)
-
+        # Build PC
+        parts_details = self.agent.get_full_component_details(selected_components)
+        build = self.building(parts_details)
+        self.save_build(build)
+        #--------------------------------- AI Agent Methods ---------------------------------#
+        
         # Stop loading animation
         stop_event.set()
         loading_thread.join()
 
         print("\nBased on your use case and budget, here's your recommended build:\n")
-        print("💻 Recommended Build:\n")
-        print("PC Build Components:\n")
-        print(f"CPU: \n{selected_components.CPU} || Price: ${allocation['CPU']:.2f}\n========================================")
-        print(f"GPU: \n{selected_components.GPU} || Price: ${allocation['GPU']:.2f}\n========================================")
-        print(f"RAM: \n{selected_components.RAM} || Price: ${allocation['RAM']:.2f}\n========================================")
-        print(f"Storage: \n{selected_components.Storage} || Price: ${allocation['Storage']:.2f}\n========================================")
-        print(f"Motherboard: \n{selected_components.Motherboard} || Price: ${allocation['Motherboard']:.2f}\n========================================")
-        print(f"PSU: \n{selected_components.PSU} || Price: ${allocation['PSU']:.2f}\n========================================\n")
+        print(build.__str__())
         print("Compatibility Check: ", compatibility)
 
-            
-
-    def view_saved_build(self):
-        # Implement the logic to view saved builds
-        print("Viewing saved builds...")
-
-    def initialize_example_builds(self):
-        gaming_build = PCBuilder().set_cpu("AMD Ryzen 5 5600X", 199, 6).set_gpu("NVIDIA RTX 3060 Ti", 399, "Ampere").set_ram(
-            "Corsair Vengeance LPX 16GB DDR4-3200", 79, 16, 3200, "DDR4"
-        ).set_storage("Kingston NV2 1TB NVMe SSD", 59, "1TB").set_motherboard(
-            "MSI B550 TOMAHAWK", 149, "AM4"
+        # Ask if the user wants to save the build   
+        def save_build():
+                save_choice = input("Would you like to save this build? (yes/no):\n> ")
+                if save_choice.lower() == 'yes':
+                    with open('saved_builds.txt', 'a') as file:
+                        file.write(build.__str__() + '\n')
+                        print("Build saved to 'saved_builds.txt'.")
+                else:
+                    print("Build not saved.")
+                 
+    def building(self,parts):
+        gaming_build = PCBuilder().set_cpu(
+            parts['CPU']['name'], parts['CPU']['price'], parts['CPU']['core_count']
+        ).set_gpu(
+            parts['GPU']['name'], parts['GPU']['price'], parts['GPU']['chipset']
+        ).set_ram(
+            parts['RAM']['name'], parts['RAM']['price'], parts['RAM']['speed'], parts['RAM']['speed']).set_storage(
+            parts['Storage']['name'], parts['Storage']['price'], parts['Storage']['capacity']
+        ).set_motherboard(
+            parts['Motherboard']['name'], parts['Motherboard']['price'], parts['Motherboard']['socket']
         ).set_psu(
-            "EVGA 600W 80+ Bronze", 49, "80+ Bronze", 600, False
-        ).build() 
+            parts['PSU']['name'], parts['PSU']['price'], parts['PSU']['efficiency'], parts['PSU']['wattage'], parts['PSU']['modular']
+        ).build()
 
-        return [gaming_build]
+        return gaming_build
+
 
 # Example usage
 if __name__ == "__main__":

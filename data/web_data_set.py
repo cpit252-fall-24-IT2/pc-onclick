@@ -46,7 +46,7 @@ class PCComponentFetcher(baseComponentRetrieval):
             df = df[df['name'].str.contains(manufacturer, case=False, na=False)]
 
         # Sort by price to get the top options within budget
-        top_options = df.sort_values(by='price').head(10)
+        top_options = df.sort_values(by='price').tail(3)
         unique_columns = ['name']
         top_options = top_options.drop_duplicates(subset=unique_columns, keep='first')
         if columns:

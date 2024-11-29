@@ -12,6 +12,5 @@ def main():
     user = UserPreferences()
     user.user_choice_()
     # Example usage
-1
 if __name__ == "__main__":
     main()
