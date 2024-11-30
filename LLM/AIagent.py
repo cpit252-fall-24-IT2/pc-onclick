@@ -86,7 +86,7 @@ class AIAgent(BaseAIAgent):
             input_variables=["budget", "usage"],
             template=(
             "As a PC expert, you are tasked with allocating a budget of: ${budget} \nfor a PC used for {usage}."
-            "Split the budget {budget} for a PC used for {usage}."
+            "Split the budget {budget} for a PC used for {usage} make sure to be realistic."
             "Return a Python dictionary in this format:\n\n- **Respond only with a Python dictionary in this exact format:**"
             "{{\n"
             "    'CPU': amount,\n"

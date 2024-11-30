@@ -13,7 +13,7 @@ class UserPreferences:
         self.budget = None
         self.build_preferences = {}
         self.agent = AIAgent(model_name='llama3.2')
-        self.saved_builds = []
+        #TODO     self.saved_builds = []
 
     def user_choice_(self):
         print("Welcome to PC ONCLICK!")
@@ -46,7 +46,7 @@ class UserPreferences:
         start_time = time.time()
 
         try:
-            while not stop_event.is_set() and (time.time() - start_time) < 15:
+            while not stop_event.is_set() and (time.time() - start_time) < 35:
                 color = colors[i % len(colors)]
                 frame = spinner[i % len(spinner)]
                 print(f"\r{color}Loading {frame}{color_reset}", end="", flush=True)
@@ -86,7 +86,7 @@ class UserPreferences:
         # Build PC
         parts_details = self.agent.get_full_component_details(selected_components)
         build = self.building(parts_details)
-        self.save_build(build)
+        #TODO self.save_build(build)
         #--------------------------------- AI Agent Methods ---------------------------------#
         
         # Stop loading animation
