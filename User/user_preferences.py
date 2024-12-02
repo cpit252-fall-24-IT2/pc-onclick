@@ -13,7 +13,7 @@ class UserPreferences:
         self.budget = None
         self.build_preferences = {}
         self.agent = AIAgent(model_name='llama3.2')
-        #TODO     self.saved_builds = []
+        self.builds = []
 
     def user_choice_(self):
         print("Welcome to PC ONCLICK!")
@@ -86,9 +86,8 @@ class UserPreferences:
         # Build PC
         parts_details = self.agent.get_full_component_details(selected_components)
         build = self.building(parts_details)
-        #TODO self.save_build(build)
         #--------------------------------- AI Agent Methods ---------------------------------#
-        
+        1
         # Stop loading animation
         stop_event.set()
         loading_thread.join()
@@ -96,16 +95,27 @@ class UserPreferences:
         print("\nBased on your use case and budget, here's your recommended build:\n")
         print(build.__str__())
         print("Compatibility Check: ", compatibility)
-
+        self.save_build(build)              
         # Ask if the user wants to save the build   
-        def save_build():
-                save_choice = input("Would you like to save this build? (yes/no):\n> ")
+    def save_build(self ,build):
+                save_choice = input("\nWould you like to save this build? (yes/no):\n> ")
                 if save_choice.lower() == 'yes':
-                    with open('saved_builds.txt', 'a') as file:
-                        file.write(build.__str__() + '\n')
-                        print("Build saved to 'saved_builds.txt'.")
+                    self.builds.append(build)  # Save the build to the array
+                    print("Build saved in memory.")
                 else:
                     print("Build not saved.")
+    
+    # print the saved build for the user
+    def view_saved_build(self):
+        if not self.builds:
+            print("\nNo saved builds found.")
+            return
+
+        print("\nSaved Builds:")
+        for i, build in enumerate(self.builds, 1):
+            print(f"\nBuild {i}:")
+            print(build.__str__())  
+
                  
     def building(self,parts):
         gaming_build = PCBuilder().set_cpu(
@@ -128,3 +138,4 @@ class UserPreferences:
 if __name__ == "__main__":
     user_preferences = UserPreferences()
     user_preferences.user_choice_()
+
