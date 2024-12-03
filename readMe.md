@@ -4,6 +4,18 @@
 
 A step-by-step system that helps users build custom PCs with real-time compatibility checking and personalized recommendations.
 
+
+
+
+
+
+
+.
+.
+.
+.
+.
+
 ## System Overview
 
 The PC Builder guides users through selecting and configuring PC components with automatic compatibility verification.
@@ -78,6 +90,10 @@ Would you like to proceed with this build? (Yes/No)
 User input: "Yes"
 ```
 
+
+
+
+## Future Work with https://onlypc-sa.com/ar/
 ### 5. Component Customization
 ```
 Would you like to modify any components?
