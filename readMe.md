@@ -8,7 +8,7 @@ A step-by-step system that helps users build custom PCs with real-time compatibi
 ### Requirements
 
 - **Ollama**: Ensure Ollama is installed and configured. Download the required AI model:
-- visit 
+- visit https://ollama.com/download
   ```bash
   ollama pull llama3.2:3b
 - Python: Install Python (version 3.8 or later).
