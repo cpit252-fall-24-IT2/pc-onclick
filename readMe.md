@@ -5,17 +5,14 @@
 A step-by-step system that helps users build custom PCs with real-time compatibility checking and personalized recommendations.
 
 
+### Requirements
 
-
-
-
-
-.
-.
-.
-.
-.
-
+- **Ollama**: Ensure Ollama is installed and configured. Download the required AI model:
+- visit 
+  ```bash
+  ollama pull llama3.2:3b
+- Python: Install Python (version 3.8 or later).
+- 
 ## System Overview
 
 The PC Builder guides users through selecting and configuring PC components with automatic compatibility verification.
