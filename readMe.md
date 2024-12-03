@@ -15,7 +15,7 @@ A step-by-step system that helps users build custom PCs with real-time compatibi
 - Python: Install Python (version 3.8 or later).
 - Install the required dependencies:
    - You can use `pip install -r requirements.txt`
-- Run the Application: in the terminal python main.py`
+- Run the Application: in the terminal `python main.py`
 
 ## System Overview
 
