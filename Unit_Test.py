@@ -3,7 +3,7 @@ from unittest.mock import patch, MagicMock
 from User.user_preferences import UserPreferences
 from User.Memento import Memento
 
-## We used CHATGPT
+## We used CHATGPT-4o
 class TestUserPreferences(unittest.TestCase):
 
     @patch('User.user_preferences.AIAgent')
