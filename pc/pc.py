@@ -15,14 +15,7 @@ class PC:
         self.storage = storage
 
     def __str__(self):
-        total_price = (
-        self.cpu.price +
-        self.gpu.price +
-        self.ram.price +
-        self.storage.price +
-        self.motherboard.price +
-        self.psu.price
-    )
+      
         return (
             "\nBased on your use case and budget, here's your recommended build:\n"
             "PC Build Components:\n"
@@ -32,7 +25,7 @@ class PC:
             f"Storage: \n{self.storage.name} || capacity:{self.storage.capacity} || Price: ${self.storage.price:.2f}\n========================================\n"
             f"Motherboard: \n{self.motherboard.name} || Price: ${self.motherboard.price:.2f}\n========================================\n"
             f"PSU: \n{self.psu.name} || wattage:{self.psu.wattage} || Price: ${self.psu.price:.2f}\n========================================\n"
-            f"Total Price: ${total_price:.2f}\n"
+           
         )
 
 class PCBuilder:
