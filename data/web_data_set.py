@@ -106,6 +106,6 @@ class PCComponentFetcher(baseComponentRetrieval):
         return component_details.iloc[0].to_dict()
 
 # Enable logging
-logging.basicConfig(level=logging.INFO)
+
 
 fetcher = PCComponentFetcher()

@@ -12,7 +12,8 @@ from data.web_data_set import PCComponentFetcher
 import ast
 
 
-# Pydantic Models
+# Pydantic Models for data validation
+# to make the input and responce in same format
 class BudgetAllocationInput(BaseModel):
     budget: float
     usage: str
