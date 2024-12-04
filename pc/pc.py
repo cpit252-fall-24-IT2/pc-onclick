@@ -29,7 +29,7 @@ class PC:
             f"CPU: \n{self.cpu.name} || core_count: {self.cpu.core_count} || Price: ${self.cpu.price:.2f}  \n========================================\n"
             f"GPU: \n{self.gpu.name} || chipset: {self.gpu.chipset} || Price: $ {self.gpu.price:.2f}  \n========================================\n"
             f"RAM: \n{self.ram.name} || capacity: {self.ram.capacity} || speed:{self.ram.speed} || Price: ${self.ram.price:.2f}\n========================================\n"
-            f"Storage: \n {self.storage.name} || capacity:{self.storage.capacity} || Price: ${self.storage.price:.2f}\n========================================\n"
+            f"Storage: \n{self.storage.name} || capacity:{self.storage.capacity} || Price: ${self.storage.price:.2f}\n========================================\n"
             f"Motherboard: \n{self.motherboard.name} || Price: ${self.motherboard.price:.2f}\n========================================\n"
             f"PSU: \n{self.psu.name} || wattage:{self.psu.wattage} || Price: ${self.psu.price:.2f}\n========================================\n"
             f"Total Price: ${total_price:.2f}\n"

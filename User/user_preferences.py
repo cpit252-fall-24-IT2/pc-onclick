@@ -46,7 +46,7 @@ class UserPreferences:
         start_time = time.time()
 
         try:
-            while not stop_event.is_set() and (time.time() - start_time) < 35:
+            while not stop_event.is_set() and (time.time() - start_time) < 30:
                 color = colors[i % len(colors)]
                 frame = spinner[i % len(spinner)]
                 print(f"\r{color}Loading {frame}{color_reset}", end="", flush=True)
@@ -59,10 +59,10 @@ class UserPreferences:
         print("\r", end="", flush=True)
 
     def get_user_preferences(self):
-        print("\nWhat type of build would you like to create?")
-        print('Gaming\nContent Creation\nGeneral Purpose')
+        print("\nWhat type of build would you like to create?\n")
+        print('"Gaming"\n"Content Creation"\n"General Purpose"')
         print('Or specify what programs you want to run or what the PC will be used for.')
-        self.use_case = input("\nPlease describe your needs:\n> ")
+        self.use_case = input("Please describe your needs:\n> ")
 
         self.budget = float(input("Enter your budget:\n> "))
 
@@ -92,9 +92,10 @@ class UserPreferences:
         stop_event.set()
         loading_thread.join()
 
-        print("\nBased on your use case and budget, here's your recommended build:\n")
+        
+        print("\nWelcome to your custom PC build!")
         print(build.__str__())
-        print("Compatibility Check: ", compatibility)
+        print("Compatibility Check:", compatibility)
         self.save_build(build)              
         # Ask if the user wants to save the build   
     def save_build(self ,build):
