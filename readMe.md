@@ -4,7 +4,7 @@
 
 A step-by-step system that helps users build custom PCs with real-time compatibility checking and personalized recommendations.
 
-
+![Untitleddesign-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/8ab9e2bd-5c4f-4809-b976-ac2f7234904e)
 ### Requirements
 
 - **Ollama**: Ensure Ollama is installed and configured. Download the required AI model:
