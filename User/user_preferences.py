@@ -32,11 +32,10 @@ class UserPreferences:
 
                 self.view_saved_pc_states()
                 index = int(input("Enter the build number to restore: ")) - 1
-                restored_pc =self.Memento_list[index]
+                restored_pc =self.restore_pc_state(index)
                 print("Restored Build:\n")
                 print(restored_pc.__str__())
-                self.save_build(restored_pc)
-                del self.Memento_list[index]  
+                self.save_build(restored_pc)  
             elif self.user_choice == '4':
                 print("Exiting...")
                 sys.exit()
@@ -136,7 +135,7 @@ class UserPreferences:
     def view_saved_build(self):
         if not self.builds:
             print("\nNo saved builds found.")
-            return
+            return None
 
         print("\nSaved Builds:")
         for i, build in enumerate(self.builds, 1):
@@ -149,6 +148,8 @@ class UserPreferences:
 
         #Memento Methods 
         #---------------------------------------------------------------------------------------
+        #---------------------------------------------------------------------------------------
+    
 
         # Save the current state in a memento
     def save_pc_state(self, pc):
@@ -158,38 +159,59 @@ class UserPreferences:
          print("PC build state has been saved.")
 
 
+
+        #Restore a PC object from a memento.
     def restore_pc_state(self, index=-1):
-        """Restore a PC object from a memento."""
-        if not self.Memento_list:
-            print("No saved PC builds to restore.")
+        if not self.validate_index(index):
             return None
         
-        if index < 0 or index >= len(self.Memento_list):
-         print("Invalid index. Please try again.")
-         return None
         # Get the memento back form the list
         memento = self.Memento_list[index]
         # Remove the memento from the list
-        del self.Memento_list[index]
+        self.remove_memento(index)
         print(f"Restored and removed PC build at index {index + 1}.")
         return memento
 
-
+        #Display all saved PC states.
     def view_saved_pc_states(self):
-        
-        """Display all saved PC states."""
-        if not self.Memento_list:
-            print("\nNo saved memento  found.")
+        if not self.validate_List:
             return None
+
 
         print("\nSaved PC Builds:")
         for i, memento in enumerate(self.Memento_list, 1):
             previous = Memento(memento)
             pc = previous.get_pc_state()
             print(f"Build {i}:")
-            print(pc.__str__())  # Assuming PC has a `__str__` method
+            print(pc.__str__())  
 
-        #---------------------------------------------------------------------------------------
+    
+    def remove_memento(self, index):
+        #Remove the memento from the list.
+        del self.Memento_list[index]
+    
+    
+       #Validate the index for the memento list. 
+    def validate_index(self, index):
+     
+     if not self.Memento_list:
+        print("No saved PC builds to restore.")
+        return False
+
+     if index < 0 or index >= len(self.Memento_list):
+        print("Invalid index. Please try again.")
+        return False
+
+     return True
+    
+    def validate_List(self):
+     
+     if not self.Memento_list:
+        print("No saved PC builds to restore.")
+        return False
+     
+     return True
+        #--------------------------------------------------------------------------------------
         #---------------------------------------------------------------------------------------
 
 
@@ -208,5 +230,3 @@ class UserPreferences:
         ).build()
 
         return gaming_build
-
-
